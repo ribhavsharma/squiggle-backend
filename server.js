@@ -6,6 +6,8 @@ require("dotenv").config();
 
 const app = express();
 
+app.use(express.json());
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
@@ -16,7 +18,7 @@ mongoose
   });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("greetings");
 });
 
 app.use("/rooms", roomRoutes);

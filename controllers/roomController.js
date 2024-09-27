@@ -1,16 +1,17 @@
-const Room = require("../models/roomModel");
-const User = require("../models/User");
+const Room = require("../models/Room");
 
 const createRoom = async (req, res) => {
-  const room = new Room();
   try {
+    const roomModel = await Room; // Wait for the model to resolve
+    const room = new roomModel(); // Create a new Room
+    console.log(room);
     await room.save();
+    res.status(201).json({ message: "room created successfully", room });
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "an error occurred while creating the room" });
+      .json({ error: "An error occurred while creating the room" });
   }
-  res.status(201).json({ message: "room created successfully", room });
 };
 
 const joinRoom = async (req, res) => {
@@ -22,8 +23,10 @@ const joinRoom = async (req, res) => {
   }
 
   try {
-    const room = await Room.findOne({ roomCode });
+    const roomModel = await Room; 
+    const room = await roomModel.findOne({ roomCode });
     const user = await User.findOne({ username });
+
     if (!room) {
       return res.status(404).json({ error: "room not found" });
     }
@@ -34,12 +37,13 @@ const joinRoom = async (req, res) => {
 
     room.users.push(username);
     await room.save();
+
+    res.status(200).json({ message: "joined room successfully", room });
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "an error occurred while joining the room" });
+      .json({ error: "An error occurred while joining the room" });
   }
-  res.status(200).json({ message: "joined room successfully", room });
 };
 
 module.exports = { createRoom, joinRoom };

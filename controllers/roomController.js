@@ -1,4 +1,5 @@
 const Room = require("../models/Room");
+const User = require("../models/User");
 
 const createRoom = async (req, res) => {
   try {
@@ -25,7 +26,8 @@ const joinRoom = async (req, res) => {
   try {
     const roomModel = await Room; 
     const room = await roomModel.findOne({ roomCode });
-    const user = await User.findOne({ username });
+    const user = await User.findOne({username: username});
+    
 
     if (!room) {
       return res.status(404).json({ error: "room not found" });

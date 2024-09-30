@@ -3,8 +3,8 @@ const User = require("../models/User");
 
 const createRoom = async (req, res) => {
   try {
-    const roomModel = await Room; // Wait for the model to resolve
-    const room = new roomModel(); // Create a new Room
+    const roomModel = await Room;
+    const room = new roomModel(); 
     console.log(room);
     await room.save();
     res.status(201).json({ message: "room created successfully", room });
@@ -44,8 +44,26 @@ const joinRoom = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "An error occurred while joining the room" });
+      .json({ error: "an error occurred while joining the room" });
   }
 };
 
-module.exports = { createRoom, joinRoom };
+const leaveRoom = async (req, res) => {
+  const roomModel = await Room; 
+  const {username, roomCode} = req.body;
+  const room = await roomModel.findOne({ roomCode });
+
+  room.users = room.users.filter((x)=> x !== username);
+  await room.save();
+
+  res.status(200).json({ message: "left room successfully", room });
+}
+
+const getAllRooms = async (req, res) => {
+  const roomModel = await Room;
+  const rooms = await roomModel.find();
+  res.status(200).json({ rooms });
+};
+
+
+module.exports = { createRoom, joinRoom, leaveRoom, getAllRooms };

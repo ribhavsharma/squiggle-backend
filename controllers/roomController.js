@@ -65,5 +65,20 @@ const getAllRooms = async (req, res) => {
   res.status(200).json({ rooms });
 };
 
+const getRoomDetails = async (req, res) => {
+  const { roomCode } = req.params;
+  const roomModel = await Room;
+  try {
+    const room = await roomModel.findOne({ roomCode });
+    console.log(room);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+    res.status(200).json({ room });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while fetching the room details" });
+  }
+};
 
-module.exports = { createRoom, joinRoom, leaveRoom, getAllRooms };
+
+module.exports = { createRoom, joinRoom, leaveRoom, getAllRooms, getRoomDetails };

@@ -8,7 +8,7 @@ router.post("/join", joinRoom);
 
 router.post("/leave", leaveRoom);
 
-router.get("/all", getAllRooms);
+router.get("/", getAllRooms);
 
 router.get("/:roomCode", getRoomDetails);
 

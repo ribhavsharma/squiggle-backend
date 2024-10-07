@@ -19,7 +19,9 @@ const createUser = async (req, res) => {
 
     res.status(201).json({ message: "user created!", user: newUser });
   } catch (error) {
-    return res.status(500).json({ error: "an error occurred while creating the user" });
+    return res
+      .status(500)
+      .json({ error: "an error occurred while creating the user" });
   }
 };
 
@@ -35,7 +37,9 @@ const deleteUser = async (req, res) => {
     await User.findByIdAndDelete(userId);
     res.status(200).json({ message: "user deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ error: "an error occurred while deleting the user" });
+    return res
+      .status(500)
+      .json({ error: "an error occurred while deleting the user" });
   }
 };
 
@@ -44,7 +48,9 @@ const getAllUsers = async (req, res) => {
     const users = await User.find({});
     return res.status(200).json(users);
   } catch (error) {
-    return res.status(500).json({ error: "an error occurred while fetching the users" });
+    return res
+      .status(500)
+      .json({ error: "an error occurred while fetching the users" });
   }
 };
 

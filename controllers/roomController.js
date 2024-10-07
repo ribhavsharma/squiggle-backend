@@ -4,7 +4,7 @@ const User = require("../models/User");
 const createRoom = async (req, res) => {
   try {
     const roomModel = await Room;
-    const room = new roomModel(); 
+    const room = new roomModel();
     console.log(room);
     await room.save();
     res.status(201).json({ message: "room created successfully", room });
@@ -24,10 +24,9 @@ const joinRoom = async (req, res) => {
   }
 
   try {
-    const roomModel = await Room; 
+    const roomModel = await Room;
     const room = await roomModel.findOne({ roomCode });
-    const user = await User.findOne({username: username});
-    
+    const user = await User.findOne({ username: username });
 
     if (!room) {
       return res.status(404).json({ error: "room not found" });
@@ -37,6 +36,9 @@ const joinRoom = async (req, res) => {
       return res.status(404).json({ error: "user not found" });
     }
 
+    if (room.users.includes(username)) {
+      return res.status(400).json({ error: "user already in room" });
+    }
     room.users.push(username);
     await room.save();
 
@@ -49,15 +51,16 @@ const joinRoom = async (req, res) => {
 };
 
 const leaveRoom = async (req, res) => {
-  const roomModel = await Room; 
-  const {username, roomCode} = req.body;
+  const roomCode = req.params.roomCode;
+  const roomModel = await Room;
+  const { username } = req.body;
   const room = await roomModel.findOne({ roomCode });
 
-  room.users = room.users.filter((x)=> x !== username);
+  room.users = room.users.filter((x) => x !== username);
   await room.save();
 
   res.status(200).json({ message: "left room successfully", room });
-}
+};
 
 const getAllRooms = async (req, res) => {
   const roomModel = await Room;
@@ -76,9 +79,34 @@ const getRoomDetails = async (req, res) => {
     }
     res.status(200).json({ room });
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while fetching the room details" });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the room details" });
   }
 };
 
+const getRoomUsers = async (req, res) => {
+  const { roomCode } = req.params;
+  const roomModel = await Room;
+  try {
+    const room = await roomModel.findOne({ roomCode });
+    console.log(room);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+    res.status(200).json({ users: room.users });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the room users" });
+  }
+};
 
-module.exports = { createRoom, joinRoom, leaveRoom, getAllRooms, getRoomDetails };
+module.exports = {
+  createRoom,
+  joinRoom,
+  leaveRoom,
+  getAllRooms,
+  getRoomDetails,
+  getRoomUsers,
+};

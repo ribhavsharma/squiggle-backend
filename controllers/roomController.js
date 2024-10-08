@@ -59,6 +59,10 @@ const leaveRoom = async (req, res) => {
   room.users = room.users.filter((x) => x !== username);
   await room.save();
 
+  if(room.users.length === 0) {
+    await roomModel.deleteOne({ roomCode });
+  }
+
   res.status(200).json({ message: "left room successfully", room });
 };
 

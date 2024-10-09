@@ -1,7 +1,6 @@
 const User = require("../models/User");
 
 const createUser = async (req, res) => {
-  console.log(req.body);
   const { username } = req.body;
   if (!username) {
     return res.status(400).json({ error: "username is required" });
@@ -26,15 +25,14 @@ const createUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const { userId } = req.body;
-  console.log(userId);
+  const { username } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ error: "userId is required" });
+  if(!username) {
+    return res.status(400).json({ error: "username is required" });
   }
 
   try {
-    await User.findByIdAndDelete(userId);
+    await User.findOneAndDelete({ username });
     res.status(200).json({ message: "user deleted successfully" });
   } catch (error) {
     return res

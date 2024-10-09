@@ -5,21 +5,13 @@ const cors = require("cors");
 const roomRoutes = require("./routes/roomRoutes");
 const userRoutes = require("./routes/userRoutes");
 const { default: mongoose } = require("mongoose");
-const session = require("express-session");
+const User = require("./models/User");
 require("dotenv").config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-
-app.use(
-  session({
-    secret: "secret-key",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -31,7 +23,7 @@ mongoose
   });
 
 app.get("/", (req, res) => {
-  res.send("greetings");
+  res.send("elo");
 });
 
 app.use("/rooms", roomRoutes);
@@ -47,11 +39,22 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("user-disconnect", async (data) => {
+    const { username } = data;
+    try {
+      await User.findOneAndDelete({ username });
+      console.log(`User ${username} deleted from the database`);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   });
 
-  socket.on("join-room", (roomCode, username, callback) => {
+  socket.on("chatMessage", (message) => {
+    console.log("message:", message);
+    io.to(message.roomCode).emit("message", message);
+  })
+
+  socket.on("join-room", (roomCode, username) => {
     socket.join(roomCode);
     console.log(username, "joined room", roomCode);
     io.to(roomCode).emit("user-joined", { username, roomCode });

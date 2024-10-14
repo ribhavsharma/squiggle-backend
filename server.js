@@ -54,6 +54,18 @@ io.on("connection", (socket) => {
     io.to(message.roomCode).emit("message", message);
   })
 
+  socket.on("draw", ({ x, y, roomCode }) => {
+    socket.to(roomCode).emit("draw-data", { x, y });
+  });
+
+  socket.on("beginPath", ({ x, y, roomCode }) => {
+    socket.to(roomCode).emit("beginPath", { x, y });
+  });
+
+  socket.on("resetCanvas", (roomCode) => {
+    socket.to(roomCode).emit("resetCanvas");
+  });
+
   socket.on("join-room", (roomCode, username) => {
     socket.join(roomCode);
     console.log(username, "joined room", roomCode);

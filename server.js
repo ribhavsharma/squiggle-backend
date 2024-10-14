@@ -77,6 +77,11 @@ io.on("connection", (socket) => {
     console.log(username, "left room", roomCode);
     io.to(roomCode).emit("user-left", { username, roomCode });
   });
+
+  socket.on("drawer-assigned", (roomCode, drawer) => {
+    io.to(roomCode).emit("drawer-assigned", drawer);
+  });
+  
 });
 
 server.listen(3000, () => {

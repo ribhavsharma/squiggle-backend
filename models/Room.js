@@ -11,6 +11,10 @@ async function createRoomSchema() {
     },
     users: [{ type: String }],
     createdAt: { type: Date, default: Date.now },
+    currentDrawer: { type: String },
+    currentWord: { type: String },
+    round: { type: Number, default: 1 },
+    maxRounds: { type: Number, default: 3 },
   });
 
   return mongoose.model("Room", roomSchema);

@@ -89,6 +89,30 @@ const getRoomDetails = async (req, res) => {
   }
 };
 
+const assignDrawer = async (req, res) => {
+  const { roomCode } = req.params;
+  const roomModel = await Room;
+
+  try {
+    const room = await roomModel.findOne({ roomCode });
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    const users = room.users;
+    const currentDrawer = users[Math.floor(Math.random() * users.length)];
+
+    room.currentDrawer = currentDrawer;
+    room.currentWord = "test"; 
+    await room.save();
+
+    res.status(200).json({ drawer: currentDrawer, word: room.currentWord });
+  } catch (error) {
+    console.error("Error during drawer assignment:", error);
+  }
+};
+  
+
 const getRoomUsers = async (req, res) => {
   const { roomCode } = req.params;
   const roomModel = await Room;
@@ -113,4 +137,5 @@ module.exports = {
   getAllRooms,
   getRoomDetails,
   getRoomUsers,
+  assignDrawer,
 };

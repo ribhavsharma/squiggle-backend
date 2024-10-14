@@ -121,6 +121,38 @@ const assignDrawer = async (req, res) => {
   }
 };
   
+const saveCanvas = async (req, res) => {
+  const { roomCode } = req.params;
+  const roomModel = await Room;
+  const { canvasData } = req.body;
+  try {
+    const room = await roomModel.findOne({ roomCode });
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+    room.canvasData = canvasData;
+    await room.save();
+    res.status(200).json({ message: 'Canvas data saved successfully' });
+  }
+  catch (error) {
+    res.status(500).json({ error: 'An error occurred while saving the canvas data' });
+  }
+};
+
+const getCanvas = async (req, res) => {
+  const { roomCode } = req.params;
+  const roomModel = await Room;
+  try {
+    const room = await roomModel.findOne({ roomCode });
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+    res.status(200).json({ canvasData: room.canvasData });
+  }
+  catch (error) {
+    res.status(500).json({ error: 'An error occurred while fetching the canvas data' });
+  }
+}
 
 const getRoomUsers = async (req, res) => {
   const { roomCode } = req.params;
@@ -153,4 +185,6 @@ module.exports = {
   getRoomDetails,
   getRoomUsers,
   assignDrawer,
+  saveCanvas,
+  getCanvas
 };

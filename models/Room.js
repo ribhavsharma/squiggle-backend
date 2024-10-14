@@ -15,6 +15,9 @@ async function createRoomSchema() {
     currentWord: { type: String },
     round: { type: Number, default: 1 },
     maxRounds: { type: Number, default: 3 },
+    host: { type: String },
+    gameStarted: { type: Boolean, default: false },
+    canvasData: { type: String },
   });
 
   return mongoose.model("Room", roomSchema);

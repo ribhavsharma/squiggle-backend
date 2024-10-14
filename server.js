@@ -78,10 +78,10 @@ io.on("connection", (socket) => {
     io.to(roomCode).emit("user-left", { username, roomCode });
   });
 
-  socket.on("drawer-assigned", (roomCode, drawer) => {
-    io.to(roomCode).emit("drawer-assigned", drawer);
+  socket.on("drawer-assigned", (roomCode, drawer, word) => {
+    io.to(roomCode).emit("drawer-assigned", { currentDrawer: drawer, currentWord: word });
   });
-  
+
 });
 
 server.listen(3000, () => {

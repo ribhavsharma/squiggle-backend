@@ -1,5 +1,6 @@
 const Room = require("../models/Room");
 const User = require("../models/User");
+const axios = require("axios");
 
 const createRoom = async (req, res) => {
   try {
@@ -7,6 +8,7 @@ const createRoom = async (req, res) => {
     const room = new roomModel();
     console.log(room);
     await room.save();
+
     res.status(201).json({ message: "room created successfully", room });
   } catch (error) {
     return res
@@ -40,6 +42,12 @@ const joinRoom = async (req, res) => {
       return res.status(400).json({ error: "user already in room" });
     }
     room.users.push(username);
+
+    if(room.users.length === 1){
+      room.host = room.users[0];
+      await room.save();
+    }
+
     await room.save();
 
     res.status(200).json({ message: "joined room successfully", room });
@@ -103,7 +111,8 @@ const assignDrawer = async (req, res) => {
     const currentDrawer = users[Math.floor(Math.random() * users.length)];
 
     room.currentDrawer = currentDrawer;
-    room.currentWord = "test"; 
+    room.currentWord = await fetchRandomWord();
+    room.gameStarted = true; 
     await room.save();
 
     res.status(200).json({ drawer: currentDrawer, word: room.currentWord });
@@ -129,6 +138,12 @@ const getRoomUsers = async (req, res) => {
       .json({ error: "An error occurred while fetching the room users" });
   }
 };
+
+const fetchRandomWord = async () => {
+  const response = await axios.get('https://random-word-form.herokuapp.com/random/noun');
+  const data = await response.data;
+  return data[0];
+}
 
 module.exports = {
   createRoom,

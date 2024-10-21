@@ -43,7 +43,7 @@ const joinRoom = async (req, res) => {
     }
     room.users.push(username);
 
-    if(room.users.length === 1){
+    if (room.users.length === 1) {
       room.host = room.users[0];
       await room.save();
     }
@@ -67,7 +67,7 @@ const leaveRoom = async (req, res) => {
   room.users = room.users.filter((x) => x !== username);
   await room.save();
 
-  if(room.users.length === 0) {
+  if (room.users.length === 0) {
     await roomModel.deleteOne({ roomCode });
   }
 
@@ -97,30 +97,6 @@ const getRoomDetails = async (req, res) => {
   }
 };
 
-const assignDrawer = async (req, res) => {
-  const { roomCode } = req.params;
-  const roomModel = await Room;
-
-  try {
-    const room = await roomModel.findOne({ roomCode });
-    if (!room) {
-      return res.status(404).json({ error: "Room not found" });
-    }
-
-    const users = room.users;
-    const currentDrawer = users[Math.floor(Math.random() * users.length)];
-
-    room.currentDrawer = currentDrawer;
-    room.currentWord = await fetchRandomWord();
-    room.gameStarted = true; 
-    await room.save();
-
-    res.status(200).json({ drawer: currentDrawer, word: room.currentWord });
-  } catch (error) {
-    console.error("Error during drawer assignment:", error);
-  }
-};
-  
 const saveCanvas = async (req, res) => {
   const { roomCode } = req.params;
   const roomModel = await Room;
@@ -128,14 +104,15 @@ const saveCanvas = async (req, res) => {
   try {
     const room = await roomModel.findOne({ roomCode });
     if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
+      return res.status(404).json({ error: "Room not found" });
     }
     room.canvasData = canvasData;
     await room.save();
-    res.status(200).json({ message: 'Canvas data saved successfully' });
-  }
-  catch (error) {
-    res.status(500).json({ error: 'An error occurred while saving the canvas data' });
+    res.status(200).json({ message: "Canvas data saved successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while saving the canvas data" });
   }
 };
 
@@ -145,21 +122,21 @@ const getCanvas = async (req, res) => {
   try {
     const room = await roomModel.findOne({ roomCode });
     if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
+      return res.status(404).json({ error: "Room not found" });
     }
     res.status(200).json({ canvasData: room.canvasData });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the canvas data" });
   }
-  catch (error) {
-    res.status(500).json({ error: 'An error occurred while fetching the canvas data' });
-  }
-}
+};
 
 const getRoomUsers = async (req, res) => {
   const { roomCode } = req.params;
   const roomModel = await Room;
   try {
     const room = await roomModel.findOne({ roomCode });
-    console.log(room);
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
@@ -172,10 +149,12 @@ const getRoomUsers = async (req, res) => {
 };
 
 const fetchRandomWord = async () => {
-  const response = await axios.get('https://random-word-form.herokuapp.com/random/noun');
+  const response = await axios.get(
+    "https://random-word-form.herokuapp.com/random/noun"
+  );
   const data = await response.data;
   return data[0];
-}
+};
 
 module.exports = {
   createRoom,
@@ -184,7 +163,6 @@ module.exports = {
   getAllRooms,
   getRoomDetails,
   getRoomUsers,
-  assignDrawer,
   saveCanvas,
-  getCanvas
+  getCanvas,
 };

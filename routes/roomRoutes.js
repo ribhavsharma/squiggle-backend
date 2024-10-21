@@ -6,7 +6,6 @@ const {
   getAllRooms,
   getRoomDetails,
   getRoomUsers,
-  assignDrawer,
   saveCanvas,
   getCanvas
 } = require("../controllers/roomController");
@@ -23,8 +22,6 @@ router.get("/:roomCode", getRoomDetails);
 router.get("/:roomCode/users", getRoomUsers);
 
 router.post("/:roomCode/leave", leaveRoom);
-
-router.post("/:roomCode/assign-drawer", assignDrawer);
 
 router.post("/:roomCode/save-canvas", saveCanvas);
 

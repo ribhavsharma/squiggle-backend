@@ -8,12 +8,28 @@ const { default: mongoose } = require("mongoose");
 const User = require("./models/User");
 const Room = require("./models/Room");
 const { default: axios } = require("axios");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
+const { verifyToken } = require("./utils/auth");
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3001",
+  credentials: true
+}));
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+  const publicRoutes = ['/login', '/users/create'];
+
+  if (publicRoutes.includes(req.path)) {
+    return next(); // skip verification for public routes
+  }
+
+  verifyToken(req, res, next); 
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
